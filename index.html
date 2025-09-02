@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Button Masher Universe</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a2f;
+      --panel-2: #0f1630;
+      --accent: #7ad7ff;
+      --accent-2: #a084ff;
+      --text: #e9f1ff;
+      --muted: #aab7d4;
+      --good: #58e38f;
+      --warn: #ffd166;
+      --bad: #ff6b6b;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 800px at 60% -10%, #16213a 0%, #0b1020 60%);
+      color: var(--text);
+      font: 14px/1.4 system-ui, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 320px 1fr 320px;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      height: 100%;
+      padding: 10px;
+    }
+    header, aside, main, footer {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid #1b2747;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    header {
+      grid-column: 1 / 4;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header .title {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    header .title h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    header .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    button, .btn {
+      background: #172349;
+      border: 1px solid #25335f;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .05s ease, background .2s;
+    }
+    button:hover {
+      background: #1d2b59;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #142347;
+      border: 1px solid #223368;
+      color: var(--muted);
+    }
+    .stat {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #0e1b38;
+      border: 1px solid #1a2d5e;
+      color: var(--accent);
+    }
+    .flex {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .grow {
+      flex: 1;
+    }
+    main {
+      position: relative;
+      overflow: hidden;
+    }
+    #space {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: radial-gradient(900px 600px at 50% 40%, rgba(122,215,255,.06), rgba(160,132,255,.05) 35%, transparent 70%),
+                 radial-gradient(1400px 1000px at 30% 110%, rgba(160,132,255,.06), transparent 60%),
+                 #060a16;
+    }
+    .singularity {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .singularity .btn {
+      pointer-events: auto;
+      user-select: none;
+      outline: none;
+    }
+    .singularity .btn.small {
+      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 45%, #1d2b59, #141f40 60%);
+      border: 1px solid #2c3d73;
+      box-shadow: 0 0 20px rgba(122, 215, 255, 0.5);
+    }
+    .panel {
+      padding: 10px;
+      border-radius: 14px;
+      background: #0f1731;
+      border: 1px solid #1c2a55;
+    }
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .upgrade {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 12px;
+      background: #0c1430;
+      border: 1px solid #1a2752;
+    }
+    .upgrade h4 {
+      margin: 0;
+      font-size: 14px;
+    }
+    .upgrade small {
+      color: var(--muted);
+    }
+    .badge {
+      border: 1px solid #22407a;
+      background: #10254d;
+      padding: 2px 6px;
+      border-radius: 8px;
+      color: var(--accent);
+      font-size: 12px;
+    }
+    aside {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+    }
+    .log {
+      height: 200px;
+      overflow: auto;
+      background: #0c132b;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #1a2752;
+    }
+    .r {
+      color: var(--muted);
+    }
+    .good {
+      color: var(--good);
+    }
+    .warn {
+      color: var(--warn);
+    }
+    .bad {
+      color: var(--bad);
+    }
+    footer {
+      grid-column: 1 / 4;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      justify-content: space-between;
+    }
+    .adbar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ad-slot {
+      flex: 1;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px dashed #2a3a6b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #85a0de;
+      background: linear-gradient(180deg, #0d1530, #0a1126);
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .tabs button {
+      padding: 6px 10px;
+    }
+    .slider {
+      accent-color: #86bcff;
+    }
+    .scroll {
+      overflow: auto;
+    }
+    .small {
+      font-size: 12px;
+    }
+    .small-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #7ad7ff, #a084ff);
+      pointer-events: none;
+      z-index: 10;
+    }
+    @keyframes particleFloat {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) scale(0.2);
+        opacity: 0;
+      }
+    }
+    .celestial-body {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .sun {
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00 60%, #ff4500);
+      box-shadow: 0 0 40px 15px rgba(255, 215, 0, 0.8), 0 0 80px 30px rgba(255, 140, 0, 0.6);
+      left: 50%;
+      top: 50%;
+      z-index: 10;
+    }
+    .orbit {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border: 1px solid rgba(122, 215, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .planet {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      display: none;
+    }
+    .mercury { 
+      width: 8px; 
+      height: 8px; 
+      background: #a9a9a9; 
+      left: calc(50% + 70px); 
+      box-shadow: 0 0 5px rgba(169, 169, 169, 0.5);
+    }
+    .venus { 
+      width: 12px; 
+      height: 12px; 
+      background: #e6e6fa; 
+      left: calc(50% + 100px); 
+      box-shadow: 0 0 5px rgba(230, 230, 250, 0.5);
+    }
+    .earth { 
+      width: 14px; 
+      height: 14px; 
+      background: #6b93d6; 
+      left: calc(50% + 130px); 
+      box-shadow: 0 0 5px rgba(107, 147, 214, 0.5);
+    }
+    .mars { 
+      width: 10px; 
+      height: 10px; 
+      background: #c1440e; 
+      left: calc(50% + 160px); 
+      box-shadow: 0 0 5px rgba(193, 68, 14, 0.5);
+    }
+    .jupiter { 
+      width: 28px; 
+      height: 28px; 
+      background: #c9b59d; 
+      left: calc(50% + 200px); 
+      box-shadow: 0 0 5px rgba(201, 181, 157, 0.5);
+    }
+    .saturn { 
+      width: 24px; 
+      height: 24px; 
+      background: #e3be76; 
+      left: calc(50% + 250px); 
+      box-shadow: 0 0 5px rgba(227, 190, 118, 0.5);
+    }
+    .saturn::after {
+      content: '';
+      position: absolute;
+      width: 36px;
+      height: 8px;
+      background: rgba(227, 190, 118, 0.4);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(20deg);
+    }
+    .uranus { 
+      width: 18px; 
+      height: 18px; 
+      background: #ace5ee; 
+      left: calc(50% + 290px); 
+      box-shadow: 0 0 5px rgba(172, 229, 238, 0.5);
+    }
+    .neptune { 
+      width: 17px; 
+      height: 17px; 
+      background: #2f6f9f; 
+      left: calc(50% + 320px); 
+      box-shadow: 0 0 5px rgba(47, 111, 159, 0.5);
+    }
+    .progress-container {
+      width: 100%;
+      height: 6px;
+      background: #0c1430;
+      border-radius: 3px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #7ad7ff, #a084ff);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .particle-count {
+      position: absolute;
+      color: #7ad7ff;
+      font-weight: bold;
+      font-size: 14px;
+      text-shadow: 0 0 5px rgba(122, 215, 255, 0.8);
+      pointer-events: none;
+      z-index: 15;
+      animation: countFloat 1.5s forwards;
+    }
+    @keyframes countFloat {
+      0% {
+        transform: translate(0, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(0, -40px);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header>
+      <div class="title">
+        <div style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 40%, #7ad7ff, #a084ff);box-shadow:0 0 16px 6px rgba(122,215,255,.4)"></div>
+        <h1>Button Masher Universe</h1>
+        <span class="pill">Incremental • Cosmic Evolution</span>
+      </div>
+
+      <div class="controls">
+        <span class="stat" id="statParticles">Particles: 0</span>
+        <span class="stat" id="statPps">P/s: 0</span>
+        <span class="pill" id="statAge">Age: 0s</span>
+        <span class="pill" id="statDM">Dark Matter: 0</span>
+
+        <label class="pill">Time x 
+          <input id="timeScale" type="range" min="1" max="100" value="1" class="slider" style="width:120px">
+          <span id="timeScaleVal">1</span>
+        </label>
+
+        <label class="pill">Zoom 
+          <input id="zoom" type="range" min="0.5" max="2" step="0.01" value="1" class="slider" style="width:120px">
+          <span id="zoomVal">1.00</span>
+        </label>
+
+        <button id="saveBtn">Save</button>
+        <button id="loadBtn">Load</button>
+        <button id="wipeBtn">Wipe</button>
+      </div>
+    </header>
+
+    <!-- Left sidebar (Upgrades & Ads & Prestige) -->
+    <aside id="leftSidebar">
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Upgrades</h3>
+        <div id="upgrades" class="list scroll" style="max-height:40vh"></div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Ad Boosts (Mock)</h3>
+        <div class="list">
+          <button id="adDoubleParticles" class="small-btn">Rewarded: 2x particles for 4h</button>
+          <button id="adInstantFormation" class="small-btn">Rewarded: Instant formation (if near)</button>
+          <button id="adBonusDM" class="small-btn">Rewarded: +25% DM on next Prestige</button>
+          <div style="height:8px"></div>
+          <div class="ad-slot">Banner Ad Placeholder</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Prestige</h3>
+        <div class="list">
+          <div class="small">Gain Dark Matter by collapsing your universe. DM gives permanent bonuses.</div>
+          <button id="prestigeBtn" class="btn">Big Crunch</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main>
+      <canvas id="space"></canvas>
+
+      <!-- Moved singularity to bottom of screen -->
+      <div class="singularity">
+        <button id="clickBtn" class="btn small">Singularity • Tap Me!</button>
+        <small class="r">Click / hold / tap to create particles</small>
+      </div>
+    </main>
+
+    <!-- Right sidebar (stats & research preview) -->
+    <aside id="rightSidebar">
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Stats</h3>
+        <div id="stats" class="list small"></div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Research (Preview)</h3>
+        <div class="list">
+          <div class="upgrade">
+            <div><h4>Physics Research</h4><small>Improve attraction & formation rates</small></div>
+            <button disabled class="pill">Coming Soon</button>
+          </div>
+          <div class="upgrade">
+            <div><h4>Cosmology Research</h4><small>Discover new celestial types</small></div>
+            <button disabled class="pill">Coming Soon</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Celestial Log below Research Preview -->
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Celestial Log</h3>
+        <div class="flex">
+          <span class="badge" id="logCount">0</span>
+          <span class="grow"></span>
+          <button id="clearLog" class="pill">Clear</button>
+        </div>
+        <div id="log" class="log"></div>
+      </div>
+    </aside>
+
+    <!-- Footer -->
+    <footer>
+      <div class="adbar">
+        <div class="ad-slot">Persistent Banner Ad Placeholder</div>
+      </div>
+      <div class="tabs">
+        <span class="pill">Build: MVP • HTML5 Canvas • Local Save</span>
+        <span class="pill">60 FPS target</span>
+        <span class="pill">Offline OK</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Solar System Display -->
+  <div id="solarSystem" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:80%; height:80%; pointer-events:none; display:none;">
+    <div class="sun"></div>
+    
+    <div class="orbit" style="width:140px; height:140px;"></div>
+    <div class="planet mercury"></div>
+    
+    <div class="orbit" style="width:200px; height:200px;"></div>
+    <div class="planet venus"></div>
+    
+    <div class="orbit" style="width:260px; height:260px;"></div>
+    <div class="planet earth"></div>
+    
+    <div class="orbit" style="width:320px; height:320px;"></div>
+    <div class="planet mars"></div>
+    
+    <div class="orbit" style="width:400px; height:400px;"></div>
+    <div class="planet jupiter"></div>
+    
+    <div class="orbit" style="width:500px; height:500px;"></div>
+    <div class="planet saturn"></div>
+    
+    <div class="orbit" style="width:580px; height:580px;"></div>
+    <div class="planet uranus"></div>
+    
+    <div class="orbit" style="width:640px; height:640px;"></div>
+    <div class="planet neptune"></div>
+  </div>
+
+  <!-- Main JS -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Game state
+      const gameState = {
+        particles: 0,
+        particlesPerClick: 1,
+        celestialBodies: [],
+        nextBodyRequirements: {
+          mercury: 10,
+          venus: 25,
+          earth: 50,
+          mars: 100,
+          jupiter: 200,
+          saturn: 350,
+          uranus: 550,
+          neptune: 800
+        },
+        unlockedBodies: []
+      };
+
+      // DOM elements
+      const particlesElement = document.getElementById('statParticles');
+      const clickBtn = document.getElementById('clickBtn');
+      const logElement = document.getElementById('log');
+      const logCountElement = document.getElementById('logCount');
+      const clearLogBtn = document.getElementById('clearLog');
+      const solarSystem = document.getElementById('solarSystem');
+      const spaceCanvas = document.getElementById('space');
+
+      // Initialize
+      updateParticleDisplay();
+      
+      // Set up click handler
+      clickBtn.addEventListener('click', function() {
+        createParticle();
+      });
+
+      // Clear log handler
+      clearLogBtn.addEventListener('click', function() {
+        logElement.innerHTML = '';
+        logCountElement.textContent = '0';
+      });
+
+      // Create a particle with animation
+      function createParticle() {
+        // Add to count
+        gameState.particles += gameState.particlesPerClick;
+        updateParticleDisplay();
+        
+        // Create visual particle
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Position around the button (now at bottom of screen)
+        const btnRect = clickBtn.getBoundingClientRect();
+        const btnCenterX = btnRect.left + btnRect.width / 2;
+        const btnCenterY = btnRect.top + btnRect.height / 2;
+        
+        // Create particles above the button
+        const offsetX = (Math.random() - 0.5) * 60;
+        const offsetY = -20 - (Math.random() * 40);
+        
+        particle.style.left = `${btnCenterX + offsetX}px`;
+        particle.style.top = `${btnCenterY + offsetY}px`;
+        
+        // Random animation - particles float upward
+        const tx = (Math.random() - 0.5) * 100;
+        const ty = -100 - (Math.random() * 100);
+        particle.style.setProperty('--tx', `${tx}px`);
+        particle.style.setProperty('--ty', `${ty}px`);
+        
+        particle.style.animation = `particleFloat ${0.8 + Math.random() * 0.7}s forwards`;
+        
+        document.body.appendChild(particle);
+        
+        // Show particle count animation
+        showParticleCount(btnCenterX, btnCenterY);
+        
+        // Remove particle after animation
+        setTimeout(() => {
+          if (particle.parentNode) {
+            document.body.removeChild(particle);
+          }
+        }, 1500);
+        
+        // Add to log
+        addToLog(`Created ${gameState.particlesPerClick} particle`);
+        
+        // Check for celestial body creation
+        checkForCelestialBody();
+      }
+
+      // Show particle count animation
+      function showParticleCount(x, y) {
+        const countElement = document.createElement('div');
+        countElement.className = 'particle-count';
+        countElement.textContent = `+${gameState.particlesPerClick}`;
+        countElement.style.left = `${x}px`;
+        countElement.style.top = `${y - 20}px`;
+        
+        document.body.appendChild(countElement);
+        
+        // Remove after animation completes
+        setTimeout(() => {
+          if (countElement.parentNode) {
+            document.body.removeChild(countElement);
+          }
+        }, 1500);
+      }
+
+      // Update particle display
+      function updateParticleDisplay() {
+        particlesElement.textContent = `Particles: ${gameState.particles}`;
+        
+        // Update progress bars for next celestial bodies
+        updateProgressBars();
+      }
+
+      // Add entry to log
+      function addToLog(message) {
+        const entry = document.createElement('div');
+        const timestamp = new Date().toLocaleTimeString();
+        entry.innerHTML = `<span class="r">[${timestamp}]</span> ${message}`;
+        logElement.appendChild(entry);
+        logElement.scrollTop = logElement.scrollHeight;
+        
+        // Update log count
+        logCountElement.textContent = parseInt(logCountElement.textContent) + 1;
+      }
+
+      // Check if a new celestial body can be created
+      function checkForCelestialBody() {
+        for (const [body, requirement] of Object.entries(gameState.nextBodyRequirements)) {
+          if (gameState.particles >= requirement && !gameState.unlockedBodies.includes(body)) {
+            unlockCelestialBody(body);
+            break;
+          }
+        }
+      }
+
+      // Unlock a new celestial body
+      function unlockCelestialBody(body) {
+        gameState.unlockedBodies.push(body);
+        addToLog(`<span class="good">${body.charAt(0).toUpperCase() + body.slice(1)} formed!</span>`);
+        
+        // Show the solar system if it's the first body
+        if (gameState.unlockedBodies.length === 1) {
+          solarSystem.style.display = 'block';
+        }
+        
+        // Show the specific planet
+        const planetElement = document.querySelector(`.${body}`);
+        if (planetElement) {
+          planetElement.style.display = 'block';
+          
+          // Add a little animation
+          planetElement.style.transform = 'translate(-50%, -50%) scale(0)';
+          setTimeout(() => {
+            planetElement.style.transition = 'transform 0.5s ease-out';
+            planetElement.style.transform = 'translate(-50%, -50%) scale(1)';
+          }, 10);
+        }
+        
+        // Update requirements for the next body
+        updateNextBodyRequirements();
+      }
+
+      // Update requirements for next celestial bodies
+      function updateNextBodyRequirements() {
+        // Increase requirements for remaining bodies
+        for (const body of Object.keys(gameState.nextBodyRequirements)) {
+          if (!gameState.unlockedBodies.includes(body)) {
+            gameState.nextBodyRequirements[body] = Math.round(gameState.nextBodyRequirements[body] * 1.5);
+          }
+        }
+        
+        updateProgressBars();
+      }
+
+      // Update progress bars for next celestial bodies
+      function updateProgressBars() {
+        // Remove any existing progress containers
+        document.querySelectorAll('.progress-container').forEach(el => el.remove());
+        
+        // Add progress for the next unlockable body
+        const nextBody = Object.keys(gameState.nextBodyRequirements).find(
+          body => !gameState.unlockedBodies.includes(body)
+        );
+        
+        if (nextBody) {
+          const requirement = gameState.nextBodyRequirements[nextBody];
+          const progress = Math.min(100, (gameState.particles / requirement) * 100);
+          
+          const progressContainer = document.createElement('div');
+          progressContainer.className = 'progress-container';
+          
+          const progressBar = document.createElement('div');
+          progressBar.className = 'progress-bar';
+          progressBar.style.width = `${progress}%`;
+          
+          progressContainer.appendChild(progressBar);
+          
+          const statsContainer = document.getElementById('stats');
+          statsContainer.appendChild(document.createElement('div'));
+          statsContainer.appendChild(progressContainer);
+          
+          const label = document.createElement('div');
+          label.className = 'small';
+          label.innerHTML = `Next: <strong>${nextBody.charAt(0).toUpperCase() + nextBody.slice(1)}</strong> (${gameState.particles}/${requirement})`;
+          statsContainer.appendChild(label);
+        }
+        
+        // Update stats display
+        updateStatsDisplay();
+      }
+
+      // Update stats display
+      function updateStatsDisplay() {
+        const statsElement = document.getElementById('stats');
+        statsElement.innerHTML = `
+          <div>Total Particles: <strong>${gameState.particles}</strong></div>
+          <div>Particles per Click: <strong>${gameState.particlesPerClick}</strong></div>
+          <div>Celestial Bodies: <strong>${gameState.unlockedBodies.length}/8</strong></div>
+        `;
+        
+        // Re-add progress bars
+        updateProgressBars();
+      }
+
+      // Initialize stats
+      updateStatsDisplay();
+    });
+  </script>
+</body>
+</html>
