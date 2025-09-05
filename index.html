@@ -3,780 +3,929 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Button Masher Universe</title>
+  <title>Button Masher Universe (Fixed Formation)</title>
   <style>
-    :root {
-      --bg: #0b1020;
-      --panel: #121a2f;
-      --panel-2: #0f1630;
-      --accent: #7ad7ff;
-      --accent-2: #a084ff;
-      --text: #e9f1ff;
-      --muted: #aab7d4;
-      --good: #58e38f;
-      --warn: #ffd166;
-      --bad: #ff6b6b;
+    :root{
+      --bg:#0b1020;--panel:#121a2f;--panel-2:#0f1630;--accent:#7ad7ff;--accent-2:#a084ff;--text:#e9f1ff;--muted:#aab7d4;--good:#58e38f;--warn:#ffd166;--bad:#ff6b6b;
     }
-    * {
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:radial-gradient(1200px 800px at 60% -10%, #16213a 0%, #0b1020 60%);color:var(--text);font:14px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .app{display:grid;grid-template-columns:320px 1fr 320px;grid-template-rows:auto 1fr auto;gap:10px;height:100%;padding:10px}
+    header,aside,main,footer{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid #1b2747;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    header{grid-column:1/4;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+    header .title{display:flex;gap:12px;align-items:center}
+    header .title h1{font-size:18px;margin:0}
+    header .controls{display:flex;gap:8px;align-items:center}
+    button, .btn{background:#172349;border:1px solid #25335f;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer;transition:transform 0.1s ease, background 0.2s ease, box-shadow 0.2s ease}
+    button:hover{background:#1d2b59}
+    button:active, .btn:active, .btn.active{transform:translateY(2px) scale(0.98);box-shadow:0 2px 10px rgba(0,0,0,0.3) !important}
+    .pill{padding:6px 10px;border-radius:999px;background:#142347;border:1px solid #223368;color:var(--muted)}
+    .stat{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#0e1b38;border:1px solid #1a2d5e;color:var(--accent)}
+    .flex{display:flex;gap:8px;align-items:center}
+    .grow{flex:1}
+    main{position:relative;overflow:hidden}
+    #space{width:100%;height:100%;display:block;background:radial-gradient(900px 600px at 50% 40%, rgba(122,215,255,.06), rgba(160,132,255,.05) 35%, transparent 70%),
+      radial-gradient(1400px 1000px at 30% 110%, rgba(160,132,255,.06), transparent 60%),
+      #060a16}
+    .singularity{position:absolute;inset:auto;left:50%;bottom:20px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:10}
+    .singularity .btn{pointer-events:auto;user-select:none;outline:none}
+    .singularity .btn::after{content:"";position:absolute;inset:-6px;border-radius:999px;box-shadow:0 0 60px 15px rgba(122,215,255,.25), 0 0 120px 30px rgba(160,132,255,.18);z-index:-1;filter:blur(4px)}
+    .singularity .btn.big{font-size:18px;padding:16px 24px;border-radius:999px;background:radial-gradient(circle at 50% 45%, #1d2b59, #141f40 60%);border:1px solid #2c3d73;transition:all 0.1s ease}
+    .panel{padding:10px;border-radius:14px;background:#0f1731;border:1px solid #1c2a55}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .upgrade{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;padding:8px;border-radius:12px;background:#0c1430;border:1px solid #1a2752}
+    .upgrade h4{margin:0;font-size:14px}
+    .upgrade small{color:var(--muted)}
+    .badge{border:1px solid #22407a;background:#10254d;padding:2px 6px;border-radius:8px;color:var(--accent);font-size:12px}
+    aside{padding:10px;display:flex;flex-direction:column;gap:10px;overflow:auto}
+    .log{height:200px;overflow:auto;background:#0c132b;padding:8px;border-radius:10px;border:1px solid #1a2752}
+    .r{color:var(--muted)}
+    .good{color:var(--good)}
+    .warn{color:var(--warn)}
+    .bad{color:var(--bad)}
+    footer{grid-column:1/4;display:flex;gap:8px;align-items:center;padding:8px 12px;justify-content:space-between}
+    .adbar{height:48px;display:flex;align-items:center;gap:10px}
+    .ad-slot{flex:1;height:38px;border-radius:10px;border:1px dashed #2a3a6b;display:flex;align-items:center;justify-content:center;color:#85a0de;background:linear-gradient(180deg,#0d1530,#0a1126)}
+    .tabs{display:flex;gap:6px}
+    .tabs button{padding:6px 10px}
+    .hidden{display:none}
+    .slider{accent-color:#86bcff}
+    .scroll{overflow:auto}
+    .hud{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+    .pulse {
+      animation: pulseAnimation 0.5s ease;
     }
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: radial-gradient(1200px 800px at 60% -10%, #16213a 0%, #0b1020 60%);
-      color: var(--text);
-      font: 14px/1.4 system-ui, Segoe UI, Roboto, Helvetica, Arial;
+    @keyframes pulseAnimation {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
-    .app {
-      display: grid;
-      grid-template-columns: 320px 1fr 320px;
-      grid-template-rows: auto 1fr auto;
-      gap: 10px;
-      height: 100%;
-      padding: 10px;
-    }
-    header, aside, main, footer {
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
-      border: 1px solid #1b2747;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-    header {
-      grid-column: 1 / 4;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header .title {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    header .title h1 {
-      font-size: 18px;
-      margin: 0;
-    }
-    header .controls {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    button, .btn {
-      background: #172349;
-      border: 1px solid #25335f;
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: transform .05s ease, background .2s;
-    }
-    button:hover {
-      background: #1d2b59;
-    }
-    button:active {
-      transform: translateY(1px);
-    }
-    .pill {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #142347;
-      border: 1px solid #223368;
-      color: var(--muted);
-    }
-    .stat {
-      display: inline-flex;
-      gap: 6px;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #0e1b38;
-      border: 1px solid #1a2d5e;
-      color: var(--accent);
-    }
-    .flex {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .grow {
-      flex: 1;
-    }
-    main {
-      position: relative;
-      overflow: hidden;
-    }
-    #space {
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: radial-gradient(900px 600px at 50% 40%, rgba(122,215,255,.06), rgba(160,132,255,.05) 35%, transparent 70%),
-                 radial-gradient(1400px 1000px at 30% 110%, rgba(160,132,255,.06), transparent 60%),
-                 #060a16;
-    }
-    .singularity {
-      position: absolute;
-      left: 50%;
-      bottom: 20px;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      pointer-events: none;
-      z-index: 20;
-    }
-    .singularity .btn {
-      pointer-events: auto;
-      user-select: none;
-      outline: none;
-    }
-    .singularity .btn.small {
-      font-size: 16px;
-      padding: 12px 20px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 50% 45%, #1d2b59, #141f40 60%);
-      border: 1px solid #2c3d73;
-      box-shadow: 0 0 20px rgba(122, 215, 255, 0.5);
-    }
-    .panel {
-      padding: 10px;
-      border-radius: 14px;
-      background: #0f1731;
-      border: 1px solid #1c2a55;
-    }
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .upgrade {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 6px;
-      align-items: center;
-      padding: 8px;
-      border-radius: 12px;
-      background: #0c1430;
-      border: 1px solid #1a2752;
-    }
-    .upgrade h4 {
-      margin: 0;
-      font-size: 14px;
-    }
-    .upgrade small {
-      color: var(--muted);
-    }
-    .badge {
-      border: 1px solid #22407a;
-      background: #10254d;
-      padding: 2px 6px;
+    .planet-progress {
+      margin-top: 8px;
+      padding: 6px;
+      background: rgba(0,0,0,0.2);
       border-radius: 8px;
-      color: var(--accent);
-      font-size: 12px;
-    }
-    aside {
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      overflow: auto;
-    }
-    .log {
-      height: 200px;
-      overflow: auto;
-      background: #0c132b;
-      padding: 8px;
-      border-radius: 10px;
-      border: 1px solid #1a2752;
-    }
-    .r {
-      color: var(--muted);
-    }
-    .good {
-      color: var(--good);
-    }
-    .warn {
-      color: var(--warn);
-    }
-    .bad {
-      color: var(--bad);
-    }
-    footer {
-      grid-column: 1 / 4;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 8px 12px;
-      justify-content: space-between;
-    }
-    .adbar {
-      height: 48px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .ad-slot {
-      flex: 1;
-      height: 38px;
-      border-radius: 10px;
-      border: 1px dashed #2a3a6b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #85a0de;
-      background: linear-gradient(180deg, #0d1530, #0a1126);
-    }
-    .tabs {
-      display: flex;
-      gap: 6px;
-    }
-    .tabs button {
-      padding: 6px 10px;
-    }
-    .slider {
-      accent-color: #86bcff;
-    }
-    .scroll {
-      overflow: auto;
-    }
-    .small {
-      font-size: 12px;
-    }
-    .small-btn {
-      padding: 6px 10px;
-      font-size: 12px;
-    }
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #7ad7ff, #a084ff);
-      pointer-events: none;
-      z-index: 10;
-    }
-    @keyframes particleFloat {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--tx), var(--ty)) scale(0.2);
-        opacity: 0;
-      }
-    }
-    .celestial-body {
-      position: absolute;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .sun {
-      width: 60px;
-      height: 60px;
-      background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00 60%, #ff4500);
-      box-shadow: 0 0 40px 15px rgba(255, 215, 0, 0.8), 0 0 80px 30px rgba(255, 140, 0, 0.6);
-      left: 50%;
-      top: 50%;
-      z-index: 10;
-    }
-    .orbit {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      border: 1px solid rgba(122, 215, 255, 0.2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .planet {
-      position: absolute;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      top: 50%;
-      display: none;
-    }
-    .mercury { 
-      width: 8px; 
-      height: 8px; 
-      background: #a9a9a9; 
-      left: calc(50% + 70px); 
-      box-shadow: 0 0 5px rgba(169, 169, 169, 0.5);
-    }
-    .venus { 
-      width: 12px; 
-      height: 12px; 
-      background: #e6e6fa; 
-      left: calc(50% + 100px); 
-      box-shadow: 0 0 5px rgba(230, 230, 250, 0.5);
-    }
-    .earth { 
-      width: 14px; 
-      height: 14px; 
-      background: #6b93d6; 
-      left: calc(50% + 130px); 
-      box-shadow: 0 0 5px rgba(107, 147, 214, 0.5);
-    }
-    .mars { 
-      width: 10px; 
-      height: 10px; 
-      background: #c1440e; 
-      left: calc(50% + 160px); 
-      box-shadow: 0 0 5px rgba(193, 68, 14, 0.5);
-    }
-    .jupiter { 
-      width: 28px; 
-      height: 28px; 
-      background: #c9b59d; 
-      left: calc(50% + 200px); 
-      box-shadow: 0 0 5px rgba(201, 181, 157, 0.5);
-    }
-    .saturn { 
-      width: 24px; 
-      height: 24px; 
-      background: #e3be76; 
-      left: calc(50% + 250px); 
-      box-shadow: 0 0 5px rgba(227, 190, 118, 0.5);
-    }
-    .saturn::after {
-      content: '';
-      position: absolute;
-      width: 36px;
-      height: 8px;
-      background: rgba(227, 190, 118, 0.4);
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(20deg);
-    }
-    .uranus { 
-      width: 18px; 
-      height: 18px; 
-      background: #ace5ee; 
-      left: calc(50% + 290px); 
-      box-shadow: 0 0 5px rgba(172, 229, 238, 0.5);
-    }
-    .neptune { 
-      width: 17px; 
-      height: 17px; 
-      background: #2f6f9f; 
-      left: calc(50% + 320px); 
-      box-shadow: 0 0 5px rgba(47, 111, 159, 0.5);
-    }
-    .progress-container {
-      width: 100%;
-      height: 6px;
-      background: #0c1430;
-      border-radius: 3px;
-      margin-top: 5px;
-      overflow: hidden;
     }
     .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #7ad7ff, #a084ff);
-      border-radius: 3px;
-      width: 0%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 4px;
       transition: width 0.3s ease;
     }
-    .particle-count {
-      position: absolute;
-      color: #7ad7ff;
-      font-weight: bold;
-      font-size: 14px;
-      text-shadow: 0 0 5px rgba(122, 215, 255, 0.8);
-      pointer-events: none;
-      z-index: 15;
-      animation: countFloat 1.5s forwards;
+    .planet-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-top: 4px;
     }
-    @keyframes countFloat {
-      0% {
-        transform: translate(0, 0);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(0, -40px);
-        opacity: 0;
-      }
+    .formation-notice {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 100;
+      animation: fadeInOut 2s ease;
+      display: none;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <!-- Header -->
     <header>
       <div class="title">
-        <div style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 40%, #7ad7ff, #a084ff);box-shadow:0 0 16px 6px rgba(122,215,255,.4)"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 40% 40%, #7ad7ff, #a084ff);box-shadow:0 0 16px 6px rgba(122,215,255,.4)"></div>
         <h1>Button Masher Universe</h1>
         <span class="pill">Incremental • Cosmic Evolution</span>
       </div>
-
       <div class="controls">
         <span class="stat" id="statParticles">Particles: 0</span>
         <span class="stat" id="statPps">P/s: 0</span>
         <span class="pill" id="statAge">Age: 0s</span>
         <span class="pill" id="statDM">Dark Matter: 0</span>
-
-        <label class="pill">Time x 
-          <input id="timeScale" type="range" min="1" max="100" value="1" class="slider" style="width:120px">
-          <span id="timeScaleVal">1</span>
-        </label>
-
-        <label class="pill">Zoom 
-          <input id="zoom" type="range" min="0.5" max="2" step="0.01" value="1" class="slider" style="width:120px">
-          <span id="zoomVal">1.00</span>
-        </label>
-
+        <label class="pill">Time x <input id="timeScale" type="range" min="1" max="100" value="1" class="slider" style="width:120px"> <span id="timeScaleVal">1</span></label>
+        <label class="pill">Zoom <input id="zoom" type="range" min="0.5" max="2" step="0.01" value="1" class="slider" style="width:120px"> <span id="zoomVal">1.00</span></label>
         <button id="saveBtn">Save</button>
         <button id="loadBtn">Load</button>
         <button id="wipeBtn">Wipe</button>
       </div>
     </header>
 
-    <!-- Left sidebar (Upgrades & Ads & Prestige) -->
     <aside id="leftSidebar">
       <div class="panel">
         <h3 style="margin:0 0 8px 0">Upgrades</h3>
         <div id="upgrades" class="list scroll" style="max-height:40vh"></div>
       </div>
-
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Planetary System</h3>
+        <div id="planetProgress" class="planet-progress">
+          <!-- Planet progress will be inserted here -->
+        </div>
+      </div>
       <div class="panel">
         <h3 style="margin:0 0 8px 0">Ad Boosts (Mock)</h3>
         <div class="list">
-          <button id="adDoubleParticles" class="small-btn">Rewarded: 2x particles for 4h</button>
-          <button id="adInstantFormation" class="small-btn">Rewarded: Instant formation (if near)</button>
-          <button id="adBonusDM" class="small-btn">Rewarded: +25% DM on next Prestige</button>
-          <div style="height:8px"></div>
+          <button id="adDoubleParticles">Rewarded: 2x particles for 4h</button>
+          <button id="adInstantFormation">Rewarded: Instant formation (if near)</button>
+          <button id="adBonusDM">Rewarded: +25% DM on next Prestige</button>
           <div class="ad-slot">Banner Ad Placeholder</div>
         </div>
       </div>
-
       <div class="panel">
         <h3 style="margin:0 0 8px 0">Prestige</h3>
         <div class="list">
-          <div class="small">Gain Dark Matter by collapsing your universe. DM gives permanent bonuses.</div>
+          <div>Gain dark matter based on total mass. Permanent boost.</div>
           <button id="prestigeBtn" class="btn">Big Crunch</button>
         </div>
       </div>
     </aside>
 
-    <!-- Main -->
     <main>
       <canvas id="space"></canvas>
-
-      <!-- Moved singularity to bottom of screen -->
       <div class="singularity">
-        <button id="clickBtn" class="btn small">Singularity • Tap Me!</button>
-        <small class="r">Click / hold / tap to create particles</small>
+        <button id="clickBtn" class="btn big">Singularity • Mash!</button>
+        <small class="r">Click to create particles • Hold (mobile) also works</small>
       </div>
+      <div id="formationNotice" class="formation-notice"></div>
     </main>
 
-    <!-- Right sidebar (stats & research preview) -->
     <aside id="rightSidebar">
       <div class="panel">
-        <h3 style="margin:0 0 8px 0">Stats</h3>
-        <div id="stats" class="list small"></div>
-      </div>
-
-      <div class="panel">
-        <h3 style="margin:0 0 8px 0">Research (Preview)</h3>
-        <div class="list">
-          <div class="upgrade">
-            <div><h4>Physics Research</h4><small>Improve attraction & formation rates</small></div>
-            <button disabled class="pill">Coming Soon</button>
-          </div>
-          <div class="upgrade">
-            <div><h4>Cosmology Research</h4><small>Discover new celestial types</small></div>
-            <button disabled class="pill">Coming Soon</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Celestial Log below Research Preview -->
-      <div class="panel">
         <h3 style="margin:0 0 8px 0">Celestial Log</h3>
-        <div class="flex">
-          <span class="badge" id="logCount">0</span>
-          <span class="grow"></span>
-          <button id="clearLog" class="pill">Clear</button>
-        </div>
+        <div class="flex"><span class="badge" id="logCount">0</span><span class="grow"></span><button id="clearLog" class="pill">Clear</button></div>
         <div id="log" class="log"></div>
+      </div>
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Stats</h3>
+        <div id="stats" class="list"></div>
       </div>
     </aside>
 
-    <!-- Footer -->
     <footer>
       <div class="adbar">
         <div class="ad-slot">Persistent Banner Ad Placeholder</div>
       </div>
       <div class="tabs">
-        <span class="pill">Build: MVP • HTML5 Canvas • Local Save</span>
-        <span class="pill">60 FPS target</span>
+        <span class="pill">Build: Orbital Formation • HTML5 Canvas • Local Save</span>
+        <span class="pill">60 FPS</span>
         <span class="pill">Offline OK</span>
       </div>
     </footer>
   </div>
 
-  <!-- Solar System Display -->
-  <div id="solarSystem" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:80%; height:80%; pointer-events:none; display:none;">
-    <div class="sun"></div>
-    
-    <div class="orbit" style="width:140px; height:140px;"></div>
-    <div class="planet mercury"></div>
-    
-    <div class="orbit" style="width:200px; height:200px;"></div>
-    <div class="planet venus"></div>
-    
-    <div class="orbit" style="width:260px; height:260px;"></div>
-    <div class="planet earth"></div>
-    
-    <div class="orbit" style="width:320px; height:320px;"></div>
-    <div class="planet mars"></div>
-    
-    <div class="orbit" style="width:400px; height:400px;"></div>
-    <div class="planet jupiter"></div>
-    
-    <div class="orbit" style="width:500px; height:500px;"></div>
-    <div class="planet saturn"></div>
-    
-    <div class="orbit" style="width:580px; height:580px;"></div>
-    <div class="planet uranus"></div>
-    
-    <div class="orbit" style="width:640px; height:640px;"></div>
-    <div class="planet neptune"></div>
-  </div>
+  <!-- Optional audio (requires internet). Safe if offline. -->
+  <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.core.min.js"></script>
 
-  <!-- Main JS -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Game state
-      const gameState = {
-        particles: 0,
-        particlesPerClick: 1,
-        celestialBodies: [],
-        nextBodyRequirements: {
-          mercury: 10,
-          venus: 25,
-          earth: 50,
-          mars: 100,
-          jupiter: 200,
-          saturn: 350,
-          uranus: 550,
-          neptune: 800
-        },
-        unlockedBodies: []
-      };
+  // ---------------------------
+  // Core Game State
+  // ---------------------------
+  const defaultState = {
+    particles: 0,
+    particlesPerClick: 1,
+    particlesPerSecond: 0,
+    celestialObjects: [],
+    upgrades: {
+      gravity: { level: 0, cost: 10, effect: 0.1 },
+      starFormation: { unlocked: false, cost: 100 },
+      planetarySystem: { unlocked: false, cost: 500 },
+      strongGravity: { level: 0, cost: 50, effect: 0.3 },
+      supermassiveBH: { level: 0, cost: 5000, effect: 3.0 }
+    },
+    achievements: [],
+    universeAge: 0,
+    totalClicks: 0,
+    darkMatter: 0,
+    dmBonusNextPrestige: 0,
+    adBuffs: { pMulti: 1, expiresAt: 0 },
+    prestigeCount: 0,
+    // Planetary system state
+    planets: {
+      mercury: { formed: false, progress: 0, required: 50, orbitRadius: 60, color: '#a5a5a5' },
+      venus: { formed: false, progress: 0, required: 80, orbitRadius: 90, color: '#e6e6fa' },
+      earth: { formed: false, progress: 0, required: 120, orbitRadius: 120, color: '#6b93d6' },
+      mars: { formed: false, progress: 0, required: 160, orbitRadius: 150, color: '#c1440e' },
+      jupiter: { formed: false, progress: 0, required: 200, orbitRadius: 200, color: '#c9b59d' },
+      saturn: { formed: false, progress: 0, required: 250, orbitRadius: 250, color: '#e3d8b0' },
+      uranus: { formed: false, progress: 0, required: 300, orbitRadius: 300, color: '#c6e2ff' },
+      neptune: { formed: false, progress: 0, required: 350, orbitRadius: 350, color: '#5b5ddf' }
+    },
+    currentOrbit: 60, // Starting orbit for Mercury
+    particlesInOrbit: {} // Track particles in each orbit
+  };
+  let S = loadState() || JSON.parse(JSON.stringify(defaultState));
 
-      // DOM elements
-      const particlesElement = document.getElementById('statParticles');
-      const clickBtn = document.getElementById('clickBtn');
-      const logElement = document.getElementById('log');
-      const logCountElement = document.getElementById('logCount');
-      const clearLogBtn = document.getElementById('clearLog');
-      const solarSystem = document.getElementById('solarSystem');
-      const spaceCanvas = document.getElementById('space');
+  // Initialize particlesInOrbit for each planet
+  for (const planetName in S.planets) {
+    if (!S.particlesInOrbit[planetName]) {
+      S.particlesInOrbit[planetName] = 0;
+    }
+  }
 
-      // Initialize
-      updateParticleDisplay();
-      
-      // Set up click handler
-      clickBtn.addEventListener('click', function() {
-        createParticle();
+  // ---------------------------
+  // Canvas & Rendering Setup
+  // ---------------------------
+  const canvas = document.getElementById('space');
+  const ctx = canvas.getContext('2d');
+  let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  let W = 0, H = 0;
+  function resize(){
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+
+  // Camera/zoom
+  let zoom = 1;
+  const zoomSlider = document.getElementById('zoom');
+  const zoomVal = document.getElementById('zoomVal');
+  zoomSlider.addEventListener('input', ()=>{ zoom=parseFloat(zoomSlider.value); zoomVal.textContent=zoom.toFixed(2);});
+
+  // ---------------------------
+  // Audio (soft)
+  // ---------------------------
+  const clickSound = new Howl({ src: ['https://cdn.jsdelivr.net/gh/anars/blank-audio/1-second-of-silence.mp3'], volume: 0 }); // silent placeholder to avoid autoplay errors
+
+  // ---------------------------
+  // Particles & Physics
+  // ---------------------------
+  const MAX_PARTICLES = 3000;
+  const particles = [];
+  const pool = [];
+  const CENTER = { x: ()=>W/2, y: ()=>H/2 };
+
+  const TYPE = { BASIC:0, STELLAR:1, DARK:2 };
+
+  function makeParticle(x,y,type=TYPE.BASIC){
+    const p = pool.pop() || {x:0,y:0,vx:0,vy:0,ax:0,ay:0,type:TYPE.BASIC,trail:[], orbitTarget: S.currentOrbit, angle: Math.random() * Math.PI * 2};
+    p.x=x; p.y=y; p.vx=(Math.random()-0.5)*0.4; p.vy=(Math.random()-0.5)*0.4; p.ax=0; p.ay=0; p.type=type; p.trail.length=0;
+    particles.push(p);
+    return p;
+  }
+  function releaseParticle(p){
+    const i = particles.indexOf(p); if(i>=0) particles.splice(i,1);
+    pool.push(p);
+  }
+
+  function spawnParticles(n, aroundCenter=true){
+    const cx = CENTER.x(), cy = CENTER.y();
+    for(let i=0;i<n && particles.length<MAX_PARTICLES;i++){
+      const r = aroundCenter? Math.random()*20 : 0;
+      const a = Math.random()*Math.PI*2;
+      makeParticle(cx + Math.cos(a)*r, cy + Math.sin(a)*r, TYPE.BASIC);
+    }
+  }
+
+  function spawnPlanetaryParticles(n, orbitRadius){
+    const cx = CENTER.x(), cy = CENTER.y();
+    for(let i=0;i<n && particles.length<MAX_PARTICLES;i++){
+      const angle = Math.random() * Math.PI * 2;
+      const distance = orbitRadius + (Math.random() * 20 - 10);
+      const x = cx + Math.cos(angle) * distance;
+      const y = cy + Math.sin(angle) * distance;
+      const p = makeParticle(x, y, TYPE.BASIC);
+      p.orbitTarget = orbitRadius;
+      p.angle = angle;
+    }
+  }
+
+  // Celestial objects
+  const CO_TYPE = { 
+    CLUSTER:'Cluster', 
+    PROTOSTAR:'Protostar', 
+    STAR:'Main Sequence Star', 
+    SYSTEM:'Planetary System', 
+    NEBULA:'Nebula', 
+    GALAXY:'Galaxy', 
+    SMBH:'Supermassive Black Hole',
+    MERCURY: 'Mercury',
+    VENUS: 'Venus',
+    EARTH: 'Earth',
+    MARS: 'Mars',
+    JUPITER: 'Jupiter',
+    SATURN: 'Saturn',
+    URANUS: 'Uranus',
+    NEPTUNE: 'Neptune'
+  };
+
+  const PLANET_COLORS = {
+    MERCURY: '#a5a5a5',
+    VENUS: '#e6e6fa',
+    EARTH: '#6b93d6',
+    MARS: '#c1440e',
+    JUPITER: '#c9b59d',
+    SATURN: '#e3d8b0',
+    URANUS: '#c6e2ff',
+    NEPTUNE: '#5b5ddf'
+  };
+
+  function addCelestial(type, x, y){
+    const obj = { id:crypto.randomUUID(), type, x, y, age:0, mass:0, pps:0 };
+    switch(type){
+      case CO_TYPE.CLUSTER: obj.mass=8; obj.pps=0; break;
+      case CO_TYPE.PROTOSTAR: obj.mass=20; obj.pps=0.5; break;
+      case CO_TYPE.STAR: obj.mass=50; obj.pps=2; break;
+      case CO_TYPE.SYSTEM: obj.mass=120; obj.pps=6; break;
+      case CO_TYPE.NEBULA: obj.mass=300; obj.pps=10; break;
+      case CO_TYPE.GALAXY: obj.mass=1000; obj.pps=40; break;
+      case CO_TYPE.SMBH: obj.mass=2000; obj.pps=0; break;
+      case CO_TYPE.MERCURY: obj.mass=10; obj.pps=0.2; break;
+      case CO_TYPE.VENUS: obj.mass=15; obj.pps=0.3; break;
+      case CO_TYPE.EARTH: obj.mass=20; obj.pps=0.4; break;
+      case CO_TYPE.MARS: obj.mass=25; obj.pps=0.5; break;
+      case CO_TYPE.JUPITER: obj.mass=40; obj.pps=0.8; break;
+      case CO_TYPE.SATURN: obj.mass=35; obj.pps=0.7; break;
+      case CO_TYPE.URANUS: obj.mass=30; obj.pps=0.6; break;
+      case CO_TYPE.NEPTUNE: obj.mass=30; obj.pps=0.6; break;
+    }
+    S.celestialObjects.push(obj);
+    log(`Formed <span class="good">${obj.type}</span> (${obj.mass} mass)`, true);
+    
+    // Show formation notice
+    const notice = document.getElementById('formationNotice');
+    notice.textContent = `${type} Formed!`;
+    notice.style.display = 'block';
+    setTimeout(() => {
+      notice.style.display = 'none';
+    }, 2000);
+    
+    return obj;
+  }
+
+  function evolve(obj){
+    if(obj.type===CO_TYPE.CLUSTER && obj.mass>=20) { obj.type=CO_TYPE.PROTOSTAR; obj.pps=0.5; log(`A cluster ignited into a <span class="good">Protostar</span>.`); }
+    else if(obj.type===CO_TYPE.PROTOSTAR && obj.mass>=50){ obj.type=CO_TYPE.STAR; obj.pps=2; log(`Protostar stabilized as a <span class="good">Main Sequence Star</span>.`); }
+    else if(obj.type===CO_TYPE.STAR && obj.mass>=120 && S.upgrades.planetarySystem.unlocked){ obj.type=CO_TYPE.SYSTEM; obj.pps=6; log(`Planets formed around a star → <span class="good">Planetary System</span>.`); }
+    else if(obj.type===CO_TYPE.SYSTEM && obj.mass>=300){ obj.type=CO_TYPE.NEBULA; obj.pps=10; log(`Multiple systems birthed a <span class="good">Nebula</span>.`); }
+    else if(obj.type===CO_TYPE.NEBULA && obj.mass>=1000){ obj.type=CO_TYPE.GALAXY; obj.pps=40; log(`Spiral arms coalesced into a <span class="good">Galaxy</span>!`); }
+  }
+
+  function drawCelestial(obj){
+    ctx.save();
+    ctx.translate(obj.x, obj.y); ctx.scale(zoom, zoom);
+    let r=0, grad;
+    switch(obj.type){
+      case CO_TYPE.CLUSTER: r=6; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(122,215,255,.7)'); grad.addColorStop(1,'rgba(122,215,255,.05)'); break;
+      case CO_TYPE.PROTOSTAR: r=8; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(255,230,170,.9)'); grad.addColorStop(1,'rgba(255,210,120,.08)'); break;
+      case CO_TYPE.STAR: r=10; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(255,240,200,1)'); grad.addColorStop(1,'rgba(255,180,80,.10)'); break;
+      case CO_TYPE.SYSTEM: r=12; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(200,240,255,1)'); grad.addColorStop(1,'rgba(140,210,255,.12)'); break;
+      case CO_TYPE.NEBULA: r=18; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(170,140,255,1)'); grad.addColorStop(1,'rgba(100,80,200,.12)'); break;
+      case CO_TYPE.GALAXY: r=24; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(210,200,255,1)'); grad.addColorStop(1,'rgba(180,130,255,.16)'); break;
+      case CO_TYPE.SMBH: r=14; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,'rgba(20,20,30,1)'); grad.addColorStop(1,'rgba(120,100,180,.18)'); break;
+      case CO_TYPE.MERCURY: r=4; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.MERCURY); grad.addColorStop(1,'rgba(165,165,165,.1)'); break;
+      case CO_TYPE.VENUS: r=5; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.VENUS); grad.addColorStop(1,'rgba(230,230,250,.1)'); break;
+      case CO_TYPE.EARTH: r=6; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.EARTH); grad.addColorStop(1,'rgba(107,147,214,.1)'); break;
+      case CO_TYPE.MARS: r=5; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.MARS); grad.addColorStop(1,'rgba(193,68,14,.1)'); break;
+      case CO_TYPE.JUPITER: r=10; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.JUPITER); grad.addColorStop(1,'rgba(201,181,157,.1)'); break;
+      case CO_TYPE.SATURN: r=9; 
+        grad=ctx.createRadialGradient(0,0,0,0,0,r); 
+        grad.addColorStop(0,PLANET_COLORS.SATURN); 
+        grad.addColorStop(1,'rgba(227,216,176,.1)'); 
+        // Draw Saturn's rings
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r*1.8, r*0.5, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(210, 180, 140, 0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        break;
+      case CO_TYPE.URANUS: r=8; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.URANUS); grad.addColorStop(1,'rgba(198,226,255,.1)'); break;
+      case CO_TYPE.NEPTUNE: r=8; grad=ctx.createRadialGradient(0,0,0,0,0,r); grad.addColorStop(0,PLANET_COLORS.NEPTUNE); grad.addColorStop(1,'rgba(91,93,223,.1)'); break;
+    }
+    ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  // ---------------------------
+  // Upgrades UI
+  // ---------------------------
+  const upgradeDefs = [
+    { key:'gravity', name:'Basic Gravity', desc:'+0.1 attraction per level', cost: s=>S.upgrades.gravity.cost * Math.pow(1.25, S.upgrades.gravity.level), buy: ()=>{ S.upgrades.gravity.level++; } },
+    { key:'strongGravity', name:'Strong Gravity', desc:'+0.3 attraction per level', cost: s=>S.upgrades.strongGravity.cost * Math.pow(1.35, S.upgrades.strongGravity.level), buy: ()=>{ S.upgrades.strongGravity.level++; } },
+    { key:'starFormation', name:'Star Formation', desc:'Enable star creation', cost: s=>S.upgrades.starFormation.cost, oneTime:true, buy: ()=>{ S.upgrades.starFormation.unlocked=true; } },
+    { key:'planetarySystem', name:'Planetary Formation', desc:'Enable planet creation', cost: s=>S.upgrades.planetarySystem.cost, oneTime:true, buy: ()=>{ S.upgrades.planetarySystem.unlocked=true; } },
+    { key:'supermassiveBH', name:'Supermassive Black Hole', desc:'Massive attraction center', cost: s=>S.upgrades.supermassiveBH.cost * Math.pow(2, S.upgrades.supermassiveBH.level), buy: ()=>{ S.upgrades.supermassiveBH.level++; createSMBH(); } },
+  ];
+
+  const upgradesEl = document.getElementById('upgrades');
+  function renderUpgrades(){
+    upgradesEl.innerHTML='';
+    for(const u of upgradeDefs){
+      const isOne = u.oneTime;
+      const owned = isOne ? getByKey(u.key) : null;
+      const cost = Math.floor(u.cost());
+      const available = S.particles >= cost;
+      const wrapper = document.createElement('div');
+      wrapper.className='upgrade';
+      wrapper.innerHTML = `<div><h4>${u.name} ${!isOne?`<span class="badge">Lv ${getLevel(u.key)}</span>`:''}</h4><small>${u.desc}</small></div>`;
+      const btn = document.createElement('button'); btn.className='btn';
+      if(isOne){
+        const unlocked = isUnlocked(u.key);
+        btn.textContent = unlocked? 'Purchased' : `Buy • ${cost}`;
+        btn.disabled = unlocked || !available;
+      }else{
+        btn.textContent = `Buy • ${cost}`;
+        btn.disabled = !available;
+      }
+      btn.addEventListener('click', ()=>{
+        if(S.particles < cost) return;
+        S.particles -= cost;  // Deduct particles when purchasing
+        u.buy();
+        log(`<span class="good">Purchased</span> ${u.name} for ${cost} particles.`);
+        renderUpgrades();
       });
+      wrapper.appendChild(btn);
+      upgradesEl.appendChild(wrapper);
+    }
+  }
+  function getLevel(key){ return S.upgrades[key]?.level||0; }
+  function isUnlocked(key){ return S.upgrades[key]?.unlocked||false; }
+  function getByKey(key){ return S.upgrades[key]; }
 
-      // Clear log handler
-      clearLogBtn.addEventListener('click', function() {
-        logElement.innerHTML = '';
-        logCountElement.textContent = '0';
-      });
+  function createSMBH(){
+    const obj = addCelestial(CO_TYPE.SMBH, CENTER.x(), CENTER.y());
+    obj.pps = 0; obj.mass = 2000 + S.upgrades.supermassiveBH.level * 500;
+  }
 
-      // Create a particle with animation
-      function createParticle() {
-        // Add to count
-        gameState.particles += gameState.particlesPerClick;
-        updateParticleDisplay();
+  // ---------------------------
+  // Planetary System Functions
+  // ---------------------------
+  function updatePlanetarySystem() {
+    // Reset particle counts for this frame
+    for (const planetName in S.particlesInOrbit) {
+      S.particlesInOrbit[planetName] = 0;
+    }
+    
+    // Count particles in each orbit
+    for (const p of particles) {
+      if (p.orbitTarget) {
+        const dx = CENTER.x() - p.x;
+        const dy = CENTER.y() - p.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // Create visual particle
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
-        // Position around the button (now at bottom of screen)
-        const btnRect = clickBtn.getBoundingClientRect();
-        const btnCenterX = btnRect.left + btnRect.width / 2;
-        const btnCenterY = btnRect.top + btnRect.height / 2;
-        
-        // Create particles above the button
-        const offsetX = (Math.random() - 0.5) * 60;
-        const offsetY = -20 - (Math.random() * 40);
-        
-        particle.style.left = `${btnCenterX + offsetX}px`;
-        particle.style.top = `${btnCenterY + offsetY}px`;
-        
-        // Random animation - particles float upward
-        const tx = (Math.random() - 0.5) * 100;
-        const ty = -100 - (Math.random() * 100);
-        particle.style.setProperty('--tx', `${tx}px`);
-        particle.style.setProperty('--ty', `${ty}px`);
-        
-        particle.style.animation = `particleFloat ${0.8 + Math.random() * 0.7}s forwards`;
-        
-        document.body.appendChild(particle);
-        
-        // Show particle count animation
-        showParticleCount(btnCenterX, btnCenterY);
-        
-        // Remove particle after animation
-        setTimeout(() => {
-          if (particle.parentNode) {
-            document.body.removeChild(particle);
-          }
-        }, 1500);
-        
-        // Add to log
-        addToLog(`Created ${gameState.particlesPerClick} particle`);
-        
-        // Check for celestial body creation
-        checkForCelestialBody();
-      }
-
-      // Show particle count animation
-      function showParticleCount(x, y) {
-        const countElement = document.createElement('div');
-        countElement.className = 'particle-count';
-        countElement.textContent = `+${gameState.particlesPerClick}`;
-        countElement.style.left = `${x}px`;
-        countElement.style.top = `${y - 20}px`;
-        
-        document.body.appendChild(countElement);
-        
-        // Remove after animation completes
-        setTimeout(() => {
-          if (countElement.parentNode) {
-            document.body.removeChild(countElement);
-          }
-        }, 1500);
-      }
-
-      // Update particle display
-      function updateParticleDisplay() {
-        particlesElement.textContent = `Particles: ${gameState.particles}`;
-        
-        // Update progress bars for next celestial bodies
-        updateProgressBars();
-      }
-
-      // Add entry to log
-      function addToLog(message) {
-        const entry = document.createElement('div');
-        const timestamp = new Date().toLocaleTimeString();
-        entry.innerHTML = `<span class="r">[${timestamp}]</span> ${message}`;
-        logElement.appendChild(entry);
-        logElement.scrollTop = logElement.scrollHeight;
-        
-        // Update log count
-        logCountElement.textContent = parseInt(logCountElement.textContent) + 1;
-      }
-
-      // Check if a new celestial body can be created
-      function checkForCelestialBody() {
-        for (const [body, requirement] of Object.entries(gameState.nextBodyRequirements)) {
-          if (gameState.particles >= requirement && !gameState.unlockedBodies.includes(body)) {
-            unlockCelestialBody(body);
+        // Find which orbit this particle is closest to
+        for (const planetName in S.planets) {
+          const planet = S.planets[planetName];
+          if (Math.abs(distance - planet.orbitRadius) < 15) {
+            S.particlesInOrbit[planetName]++;
             break;
           }
         }
       }
-
-      // Unlock a new celestial body
-      function unlockCelestialBody(body) {
-        gameState.unlockedBodies.push(body);
-        addToLog(`<span class="good">${body.charAt(0).toUpperCase() + body.slice(1)} formed!</span>`);
+    }
+    
+    // Check if we should form a new planet
+    const planetOrder = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    
+    for (const planetName of planetOrder) {
+      const planet = S.planets[planetName];
+      
+      if (!planet.formed) {
+        // Update progress based on particles in orbit
+        const particlesInOrbit = S.particlesInOrbit[planetName] || 0;
+        planet.progress = Math.min(planet.required, particlesInOrbit);
         
-        // Show the solar system if it's the first body
-        if (gameState.unlockedBodies.length === 1) {
-          solarSystem.style.display = 'block';
-        }
-        
-        // Show the specific planet
-        const planetElement = document.querySelector(`.${body}`);
-        if (planetElement) {
-          planetElement.style.display = 'block';
+        // Check if planet is ready to form
+        if (particlesInOrbit >= planet.required) {
+          planet.formed = true;
+          S.currentOrbit = planet.orbitRadius + 30; // Set next orbit radius
           
-          // Add a little animation
-          planetElement.style.transform = 'translate(-50%, -50%) scale(0)';
-          setTimeout(() => {
-            planetElement.style.transition = 'transform 0.5s ease-out';
-            planetElement.style.transform = 'translate(-50%, -50%) scale(1)';
-          }, 10);
-        }
-        
-        // Update requirements for the next body
-        updateNextBodyRequirements();
-      }
-
-      // Update requirements for next celestial bodies
-      function updateNextBodyRequirements() {
-        // Increase requirements for remaining bodies
-        for (const body of Object.keys(gameState.nextBodyRequirements)) {
-          if (!gameState.unlockedBodies.includes(body)) {
-            gameState.nextBodyRequirements[body] = Math.round(gameState.nextBodyRequirements[body] * 1.5);
+          // Remove particles that formed this planet
+          let particlesRemoved = 0;
+          for (let i = particles.length - 1; i >= 0 && particlesRemoved < planet.required; i--) {
+            const p = particles[i];
+            const dx = CENTER.x() - p.x;
+            const dy = CENTER.y() - p.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (Math.abs(distance - planet.orbitRadius) < 15) {
+              releaseParticle(p);
+              particlesRemoved++;
+            }
           }
+          
+          // Create the planet at a position where most particles were clustered
+          const angle = Math.random() * Math.PI * 2;
+          const x = CENTER.x() + Math.cos(angle) * planet.orbitRadius;
+          const y = CENTER.y() + Math.sin(angle) * planet.orbitRadius;
+          
+          addCelestial(CO_TYPE[planetName.toUpperCase()], x, y);
+          log(`<span class="good">${planetName.charAt(0).toUpperCase() + planetName.slice(1)}</span> has formed from ${particlesRemoved} particles!`, true);
         }
-        
-        updateProgressBars();
+        break; // Only work on the next unformed planet
       }
+    }
+    
+    renderPlanetProgress();
+  }
 
-      // Update progress bars for next celestial bodies
-      function updateProgressBars() {
-        // Remove any existing progress containers
-        document.querySelectorAll('.progress-container').forEach(el => el.remove());
-        
-        // Add progress for the next unlockable body
-        const nextBody = Object.keys(gameState.nextBodyRequirements).find(
-          body => !gameState.unlockedBodies.includes(body)
-        );
-        
-        if (nextBody) {
-          const requirement = gameState.nextBodyRequirements[nextBody];
-          const progress = Math.min(100, (gameState.particles / requirement) * 100);
-          
-          const progressContainer = document.createElement('div');
-          progressContainer.className = 'progress-container';
-          
-          const progressBar = document.createElement('div');
-          progressBar.className = 'progress-bar';
-          progressBar.style.width = `${progress}%`;
-          
-          progressContainer.appendChild(progressBar);
-          
-          const statsContainer = document.getElementById('stats');
-          statsContainer.appendChild(document.createElement('div'));
-          statsContainer.appendChild(progressContainer);
-          
-          const label = document.createElement('div');
-          label.className = 'small';
-          label.innerHTML = `Next: <strong>${nextBody.charAt(0).toUpperCase() + nextBody.slice(1)}</strong> (${gameState.particles}/${requirement})`;
-          statsContainer.appendChild(label);
-        }
-        
-        // Update stats display
-        updateStatsDisplay();
+  function renderPlanetProgress() {
+    const container = document.getElementById('planetProgress');
+    container.innerHTML = '<h4 style="margin:0 0 8px 0">Planet Formation Progress</h4>';
+    
+    const planetOrder = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    
+    for (const planetName of planetOrder) {
+      const planet = S.planets[planetName];
+      const particlesInOrbit = S.particlesInOrbit[planetName] || 0;
+      const progressPercent = Math.min(100, (particlesInOrbit / planet.required) * 100);
+      
+      const planetDiv = document.createElement('div');
+      planetDiv.className = 'planet-item';
+      planetDiv.innerHTML = `
+        <div class="planet-info">
+          <span>${planetName.charAt(0).toUpperCase() + planetName.slice(1)}</span>
+          <span>${planet.formed ? 'Formed' : `${particlesInOrbit}/${planet.required}`}</span>
+        </div>
+        ${planet.formed ? '' : `
+          <div class="progress-bar" style="width: ${progressPercent}%"></div>
+        `}
+      `;
+      
+      container.appendChild(planetDiv);
+    }
+  }
+
+  // ---------------------------
+  // UI: Stats & Log
+  // ---------------------------
+  const statParticles = document.getElementById('statParticles');
+  const statPps = document.getElementById('statPps');
+  const statAge = document.getElementById('statAge');
+  const statDM = document.getElementById('statDM');
+  const statsList = document.getElementById('stats');
+  const logEl = document.getElementById('log');
+  const logCountEl = document.getElementById('logCount');
+  const clearLogBtn = document.getElementById('clearLog');
+  clearLogBtn.addEventListener('click', ()=>{ logEl.innerHTML=''; logCountEl.textContent='0';});
+  let logCount=0;
+  function log(msg, important=false){
+    const t = new Date().toLocaleTimeString();
+    const div = document.createElement('div');
+    div.innerHTML = `<span class="r">[${t}]</span> ${msg}`;
+    logEl.appendChild(div); logEl.scrollTop = logEl.scrollHeight; logCount++; logCountEl.textContent=logCount;
+    if(important){
+      // little flash in title
+      document.title = '★ ' + document.title;
+      setTimeout(()=>{ document.title = 'Button Masher Universe (Fixed Formation)'; }, 800);
+    }
+  }
+
+  function renderStatsPanel(){
+    const co = S.celestialObjects;
+    const totals = co.reduce((a,c)=>{a.mass+=c.mass; a.pps+=c.pps; return a;},{mass:0,pps:0});
+    
+    // Count planets
+    const planetCount = Object.values(S.planets).filter(p => p.formed).length;
+    
+    const lines = [
+      `Total Mass: <strong>${Math.floor(totals.mass)}</strong>`,
+      `Objects: <strong>${co.length}</strong>`,
+      `Particles: <strong>${particles.length}</strong>`,
+      `Planets Formed: <strong>${planetCount}/8</strong>`,
+      `Clicks: <strong>${S.totalClicks}</strong>`,
+      `P/click: <strong>${S.particlesPerClick.toFixed(2)}</strong>`,
+      `Base P/s: <strong>${totals.pps.toFixed(2)}</strong>`,
+      `Effective P/s: <strong>${(effectivePPS(totals.pps)).toFixed(2)}</strong>`,
+      `Gravity Lv: <strong>${S.upgrades.gravity.level}</strong> • Strong Lv: <strong>${S.upgrades.strongGravity.level}</strong>`,
+      `Star Formation: <strong>${S.upgrades.starFormation.unlocked?'Yes':'No'}</strong>`,
+      `Planetary Formation: <strong>${S.upgrades.planetarySystem.unlocked?'Yes':'No'}</strong>`,
+      `Prestiges: <strong>${S.prestigeCount}</strong>`
+    ];
+    statsList.innerHTML = lines.map(l=>`<div>${l}</div>`).join('');
+  }
+
+  // ---------------------------
+  // Progression & Prestige
+  // ---------------------------
+  function effectivePPS(base){
+    const dmMulti = 1 + S.darkMatter * 0.01; // +1% per DM
+    const adMulti = (S.adBuffs.expiresAt>performance.now()) ? S.adBuffs.pMulti : 1;
+    return base * dmMulti * adMulti;
+  }
+
+  function prestigeGainEstimate(){
+    const mass = S.celestialObjects.reduce((a,c)=>a+c.mass,0);
+    const base = Math.sqrt(mass/100);
+    const bonus = 1 + S.dmBonusNextPrestige;
+    return Math.floor(base * bonus);
+  }
+
+  function bigCrunch(){
+    const gain = prestigeGainEstimate();
+    S.darkMatter += gain;
+    S.prestigeCount++;
+    S.dmBonusNextPrestige = 0;
+    log(`<span class="good">Big Crunch!</span> Gained <strong>${gain}</strong> Dark Matter.`, true);
+    // reset most state
+    const keep = { darkMatter:S.darkMatter, prestigeCount:S.prestigeCount };
+    S = JSON.parse(JSON.stringify(defaultState));
+    S.darkMatter = keep.darkMatter; S.prestigeCount = keep.prestigeCount;
+    saveState();
+    renderUpgrades();
+    renderPlanetProgress();
+  }
+
+  document.getElementById('prestigeBtn').addEventListener('click', ()=>{
+    if(confirm(`Reset your universe for Dark Matter? (Est. +${prestigeGainEstimate()})`)) bigCrunch();
+  });
+
+  // ---------------------------
+  // Input: Clicking / Holding
+  // ---------------------------
+  const clickBtn = document.getElementById('clickBtn');
+  let holding=false, lastHold=0;
+  
+  // Improved button interaction with visual feedback
+  function addButtonInteraction(button) {
+    button.addEventListener('mousedown', ()=>{
+      button.classList.add('active');
+      if(button.id === 'clickBtn') {
+        holding = true;
+        doClick();
       }
-
-      // Update stats display
-      function updateStatsDisplay() {
-        const statsElement = document.getElementById('stats');
-        statsElement.innerHTML = `
-          <div>Total Particles: <strong>${gameState.particles}</strong></div>
-          <div>Particles per Click: <strong>${gameState.particlesPerClick}</strong></div>
-          <div>Celestial Bodies: <strong>${gameState.unlockedBodies.length}/8</strong></div>
-        `;
-        
-        // Re-add progress bars
-        updateProgressBars();
-      }
-
-      // Initialize stats
-      updateStatsDisplay();
     });
+    
+    button.addEventListener('mouseup', ()=>{
+      button.classList.remove('active');
+      if(button.id === 'clickBtn') holding = false;
+    });
+    
+    button.addEventListener('mouseleave', ()=>{
+      button.classList.remove('active');
+      if(button.id === 'clickBtn') holding = false;
+    });
+    
+    button.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      button.classList.add('active');
+      if(button.id === 'clickBtn') {
+        holding = true;
+        doClick();
+      }
+    });
+    
+    button.addEventListener('touchend', ()=>{
+      button.classList.remove('active');
+      if(button.id === 'clickBtn') holding = false;
+    });
+  }
+  
+  // Apply button interactions to all buttons
+  document.querySelectorAll('button').forEach(btn => {
+    addButtonInteraction(btn);
+  });
+
+  function doClick(){
+    S.totalClicks++;
+    const multi = 1 + S.darkMatter*0.01;
+    const gain = S.particlesPerClick * multi * ((S.adBuffs.expiresAt>performance.now())?S.adBuffs.pMulti:1);
+    S.particles += gain;
+    
+    // Spawn particles in the appropriate orbit
+    spawnPlanetaryParticles(Math.min(20, Math.ceil(gain)), S.currentOrbit);
+    
+    // Add visual feedback
+    clickBtn.classList.add('pulse');
+    setTimeout(() => {
+      clickBtn.classList.remove('pulse');
+    }, 500);
+  }
+
+  // ---------------------------
+  // Ads (Mock Implementation)
+  // ---------------------------
+  document.getElementById('adDoubleParticles').addEventListener('click', ()=>{
+    S.adBuffs.pMulti = 2;
+    const fourHours = 4*60*60*1000;
+    S.adBuffs.expiresAt = performance.now() + fourHours;
+    log(`Rewarded Ad: <span class="good">2x particles</span> for 4 hours applied.`);
+  });
+  document.getElementById('adInstantFormation').addEventListener('click', ()=>{
+    // If a planet is close to formation, complete it
+    const planetOrder = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    for (const planetName of planetOrder) {
+      const planet = S.planets[planetName];
+      if (!planet.formed && planet.progress >= planet.required * 0.7) {
+        // Add enough particles to complete the planet
+        const needed = planet.required - planet.progress;
+        for (let i = 0; i < needed; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = planet.orbitRadius + (Math.random() * 10 - 5);
+          const x = CENTER.x() + Math.cos(angle) * distance;
+          const y = CENTER.y() + Math.sin(angle) * distance;
+          const p = makeParticle(x, y, TYPE.BASIC);
+          p.orbitTarget = planet.orbitRadius;
+        }
+        log(`Rewarded Ad: Added particles to complete ${planetName}.`);
+        return;
+      }
+    }
+    log(`No planet near formation threshold.`);
+  });
+  document.getElementById('adBonusDM').addEventListener('click', ()=>{
+    S.dmBonusNextPrestige = Math.max(S.dmBonusNextPrestige, 0.25);
+    log(`Rewarded Ad: <span class="good">+25% Dark Matter</span> on next Prestige.`);
+  });
+
+  // ---------------------------
+  // Time & Game Loop
+  // ---------------------------
+  const timeScale = document.getElementById('timeScale');
+  const timeScaleVal = document.getElementById('timeScaleVal');
+  timeScale.addEventListener('input', ()=>{ timeScaleVal.textContent=timeScale.value; });
+
+  let last=performance.now();
+  function loop(now){
+    const rawDt = Math.min(0.05, (now-last)/1000); // clamp 50ms
+    last = now;
+    const dt = rawDt * parseFloat(timeScale.value);
+
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  function update(dt){
+    // Universe age
+    S.universeAge += dt;
+
+    // Handle holding the button for continuous clicks
+    if(holding && performance.now() - lastHold > 100) {
+      doClick();
+      lastHold = performance.now();
+    }
+
+    // Passive generation from celestial objects
+    let basePps = 0;
+    for(const o of S.celestialObjects){
+      o.age += dt; basePps += o.pps;
+      // slow mass increase as they attract particles
+      o.mass += dt * (0.2 + getGravityTotal()*0.1);
+      evolve(o);
+    }
+    const gain = effectivePPS(basePps) * dt;
+    S.particles += gain;
+
+    // Physics: attraction toward center + celestial objects + SMBH if any
+    const G = getGravityTotal();
+    for(const p of particles){
+      p.ax = p.ay = 0;
+      
+      // Orbital behavior for particles
+      if (p.orbitTarget) {
+        const dx = CENTER.x() - p.x;
+        const dy = CENTER.y() - p.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const targetDistance = p.orbitTarget;
+        
+        // Adjust velocity to achieve orbit
+        if (Math.abs(distance - targetDistance) > 5) {
+          const direction = distance > targetDistance ? -1 : 1;
+          p.ax += (dx / distance) * direction * 0.1;
+          p.ay += (dy / distance) * direction * 0.1;
+        }
+        
+        // Add tangential velocity for orbital motion
+        const tangentX = -dy / distance;
+        const tangentY = dx / distance;
+        const orbitalSpeed = 0.3 * Math.sqrt(G * 50 / targetDistance);
+        p.vx += tangentX * orbitalSpeed * dt;
+        p.vy += tangentY * orbitalSpeed * dt;
+        
+        // Update angle for orbital position
+        p.angle += orbitalSpeed * dt * 0.5;
+      }
+      
+      // Center attraction
+      const dx = CENTER.x()-p.x, dy = CENTER.y()-p.y; 
+      let d2 = dx*dx+dy*dy; 
+      const d = Math.max(6, Math.sqrt(d2));
+      const f = (G)/(d2+50);
+      p.ax += f*dx; p.ay += f*dy;
+      
+      // celestial pulls
+      for(const o of S.celestialObjects){
+        const dx2 = o.x-p.x, dy2 = o.y-p.y; 
+        const dd2 = dx2*dx2+dy2*dy2; 
+        const dd = Math.max(6, Math.sqrt(dd2));
+        const ff = (G*o.mass*0.02)/(dd2+100);
+        p.ax += ff*dx2; p.ay += ff*dy2;
+      }
+      
+      p.vx = (p.vx + p.ax*dt) * 0.995; // light damping
+      p.vy = (p.vy + p.ay*dt) * 0.995;
+      p.x += p.vx*dt*60; p.y += p.vy*dt*60;
+      
+      // record trail
+      p.trail.push({x:p.x,y:p.y}); if(p.trail.length>6) p.trail.shift();
+    }
+
+    // Update planetary system (check for planet formation)
+    updatePlanetarySystem();
+
+    // Update HUD
+    statParticles.textContent = `Particles: ${Math.floor(S.particles).toLocaleString()}`;
+    statPps.textContent = `P/s: ${effectivePPS(S.celestialObjects.reduce((a,c)=>a+c.pps,0)).toFixed(2)}`;
+    statAge.textContent = `Age: ${Math.floor(S.universeAge)}s`;
+    statDM.textContent = `Dark Matter: ${Math.floor(S.darkMatter)}`;
+    renderStatsPanel();
+    renderUpgrades();
+  }
+
+  function getGravityTotal(){
+    return S.upgrades.gravity.level * S.upgrades.gravity.effect + S.upgrades.strongGravity.level * S.upgrades.strongGravity.effect + (S.upgrades.supermassiveBH.level>0?1.5:0.4);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // Draw orbital rings (only for unformed planets)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(122,215,255,0.1)';
+    ctx.setLineDash([5, 5]);
+    for (const planetName in S.planets) {
+      const planet = S.planets[planetName];
+      if (!planet.formed) {
+        ctx.beginPath();
+        ctx.arc(CENTER.x(), CENTER.y(), planet.orbitRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // background starfield flicker
+    ctx.globalAlpha = 0.25; for(let i=0;i<40;i++){ ctx.fillStyle = '#2a3a6b'; ctx.fillRect(Math.random()*W, Math.random()*H, 1, 1); }
+    ctx.globalAlpha = 1;
+
+    // draw trails
+    ctx.save();
+    for(const p of particles){
+      ctx.beginPath();
+      for(let i=0;i<p.trail.length;i++){
+        const t = p.trail[i];
+        if(i===0) ctx.moveTo(t.x, t.y); else ctx.lineTo(t.x, t.y);
+      }
+      ctx.strokeStyle = 'rgba(122,215,255,.25)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+    ctx.restore();
+
+    // draw particles
+    for(const p of particles){
+      ctx.save(); ctx.translate(p.x, p.y); ctx.scale(zoom, zoom);
+      const r = p.type===TYPE.DARK?1.5:1.8;
+      const g = ctx.createRadialGradient(0,0,0,0,0,r*2);
+      if(p.type===TYPE.DARK){ g.addColorStop(0,'rgba(130,110,200,.6)'); g.addColorStop(1,'rgba(80,60,140,.04)'); }
+      else { g.addColorStop(0,'rgba(122,215,255,.9)'); g.addColorStop(1,'rgba(122,215,255,.05)'); }
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    // draw celestial objects
+    for(const o of S.celestialObjects){ drawCelestial(o); }
+
+    // center ripple
+    ctx.save(); ctx.translate(CENTER.x(), CENTER.y()); ctx.scale(zoom, zoom);
+    const t = (performance.now()/1000)%1; const rr = 12 + Math.sin(t*Math.PI*2)*1.5;
+    ctx.strokeStyle = 'rgba(160,132,255,.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0,0,rr,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---------------------------
+  // Save / Load
+  // ---------------------------
+  const saveBtn = document.getElementById('saveBtn');
+  const loadBtn = document.getElementById('loadBtn');
+  const wipeBtn = document.getElementById('wipeBtn');
+
+  function saveState(){ localStorage.setItem('bmu_save', JSON.stringify(S)); log('Game saved.'); }
+  function loadState(){ try { const raw = localStorage.getItem('bmu_save'); return raw? JSON.parse(raw): null; } catch(e){ console.warn(e); return null; } }
+
+  saveBtn.addEventListener('click', saveState);
+  loadBtn.addEventListener('click', ()=>{ const L = loadState(); if(L){ S=L; log('Save loaded.', true); } else log('No save found.');});
+  wipeBtn.addEventListener('click', ()=>{ if(confirm('Wipe local save and reset?')){ localStorage.removeItem('bmu_save'); S=JSON.parse(JSON.stringify(defaultState)); log('Save wiped.'); }});
+
+  // ---------------------------
+  // Boot: initial UI and seed
+  // ---------------------------
+  renderUpgrades();
+  renderStatsPanel();
+  renderPlanetProgress();
+  log('Welcome to Button Masher Universe. Mash the Singularity to form planets!');
+  log('Particles will orbit and combine to form planets when enough are in the same orbit.');
+
+  // Start with a few particles for flair
+  spawnParticles(30);
   </script>
 </body>
 </html>
